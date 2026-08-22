@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — Sample Roadmap{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop py-unit-xl">
+
+  <div class="flex items-center gap-unit-sm mb-unit-md">
+    <span id="statusBadge" class="inline-flex items-center gap-1.5 text-[11px] font-label-sm text-primary uppercase px-3 py-1 border border-primary/30 rounded-full bg-primary/5">
+      <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Sample Analysis
+    </span>
+    <span id="statusNote" class="text-[11px] text-on-surface-variant/60 italic">This is an illustrative example — your real report is generated from your own answers.</span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-unit-xl items-start mb-unit-xl">
+    <div>
+      <span class="font-label-lg text-secondary uppercase tracking-widest">Primary Match</span>
+      <h1 class="font-headline-xl text-headline-xl-mobile lg:text-headline-xl text-on-surface mt-unit-sm">
+        Your Ideal Career Path:<br/><span id="recommendedPath" class="text-secondary italic">Software Engineering</span>
+      </h1>
+      <p id="whyItFits" class="font-body-lg text-on-surface-variant mt-unit-md max-w-lg">
+        Based on your aptitude for logic, pattern recognition, and systemic problem-solving,
+        this path aligns closely with your assessment results.
+      </p>
+      <p id="macroContextNote" class="font-body-sm text-on-surface-variant/70 italic mt-unit-sm max-w-lg"></p>
+      <div class="flex flex-wrap gap-unit-sm mt-unit-lg">
+        <button id="downloadBtn"
+                class="hidden inline-flex items-center gap-unit-sm px-unit-lg py-3 bg-secondary text-on-secondary font-label-lg rounded-lg shadow-lg shadow-secondary/20 hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-[18px]">download</span> Download PDF Report
+        </button>
+        <button id="saveBtn"
+                class="hidden inline-flex items-center gap-unit-sm px-unit-lg py-3 bg-surface-container-high border border-outline-variant/30 text-on-surface font-label-lg rounded-lg hover:border-secondary hover:text-secondary transition-colors">
+          <span class="material-symbols-outlined text-[18px]" id="saveBtnIcon">bookmark_add</span>
+          <span id="saveBtnLabel">Save This Roadmap</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Outlook card with growth chart -->
+    <div class="bg-surface-container-low border border-outline-variant/20 rounded-xl shadow-2xl p-unit-lg relative overflow-hidden">
+      <div class="absolute -right-10 -top-10 w-52 h-52 bg-secondary/10 blur-[80px] rounded-full"></div>
+
+      <h3 class="font-headline-sm text-on-surface mb-unit-md relative z-10">10-Year Outlook</h3>
+
+      <!-- Animated SVG line/area chart -->
+      <svg viewBox="0 0 400 160" class="w-full h-auto relative z-10">
+        <defs>
+          <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#eac174" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#eac174" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- gridlines -->
+        <g stroke="#3A4568" stroke-width="0.5" opacity="0.4">
+          <line x1="0" y1="20" x2="400" y2="20"/>
+          <line x1="0" y1="60" x2="400" y2="60"/>
+          <line x1="0" y1="100" x2="400" y2="100"/>
+          <line x1="0" y1="140" x2="400" y2="140"/>
+        </g>
+        <!-- area under curve -->
+        <path d="M0,120 C60,110 90,90 140,80 C190,70 220,50 270,38 C320,26 360,20 400,10 L400,150 L0,150 Z"
+              fill="url(#areaFill)"/>
+        <!-- line -->
+        <path d="M0,120 C60,110 90,90 140,80 C190,70 220,50 270,38 C320,26 360,20 400,10"
+              fill="none" stroke="#eac174" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- points -->
+        <circle cx="0" cy="120" r="3.5" fill="#eac174"/>
+        <circle cx="140" cy="80" r="3.5" fill="#eac174"/>
+        <circle cx="270" cy="38" r="3.5" fill="#eac174"/>
+        <circle cx="400" cy="10" r="4.5" fill="#eac174" stroke="#0A0E1A" stroke-width="2"/>
+        <!-- year labels -->
+        <text x="0" y="155" fill="#8E97A8" font-size="10" font-family="Arial">2026</text>
+        <text x="182" y="155" fill="#8E97A8" font-size="10" font-family="Arial" text-anchor="middle">2031</text>
+        <text x="400" y="155" fill="#8E97A8" font-size="10" font-family="Arial" text-anchor="end">2036</text>
+      </svg>
+
+      <div class="grid grid-cols-2 gap-unit-md mt-unit-md relative z-10">
+        <div>
+          <p class="font-label-sm text-on-surface-variant uppercase">Demand Trend</p>
+          <p class="font-headline-sm text-secondary">Growing</p>
+        </div>
+        <div>
+          <p class="font-label-sm text-on-surface-variant uppercase">Outlook Source</p>
+          <p class="font-body-sm text-on-surface-variant">O*NET Bright Outlook</p>
+        </div>
+      </div>
+      <p class="text-[10px] text-on-surface-variant/50 italic mt-unit-sm">
+        Sample chart shape shown for illustration. Real charts will be built from live O*NET / ILOSTAT projection data.
+      </p>
+    </div>
+  </div>
+
+  <!-- Info cards row -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+    <div class="bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10">
+      <div class="w-10 h-10 bg-secondary/15 text-secondary flex items-center justify-center rounded-lg mb-unit-md">
+        <span class="material-symbols-outlined">psychology</span>
+      </div>
+      <h3 class="font-headline-sm text-on-surface mb-unit-sm">Required Skills</h3>
+      <ul id="skillsList" class="font-body-sm text-on-surface-variant space-y-1 list-disc list-inside">
+        <li>Mathematical Logic</li><li>Python & Backend Systems</li>
+        <li>Agile Problem Solving</li><li>System Architecture</li>
+      </ul>
+    </div>
+    <div class="bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10">
+      <div class="w-10 h-10 bg-primary/15 text-primary flex items-center justify-center rounded-lg mb-unit-md">
+        <span class="material-symbols-outlined">school</span>
+      </div>
+      <h3 class="font-headline-sm text-on-surface mb-unit-sm">Best-Matched Universities</h3>
+      <ul id="universitiesList" class="font-body-sm text-on-surface-variant space-y-2">
+        <li>NUST — Islamabad</li><li>FAST-NUCES — Lahore</li>
+      </ul>
+      <p class="text-[10px] text-on-surface-variant/50 italic mt-unit-sm">Ranked best real match first.</p>
+    </div>
+    <div class="bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10">
+      <div class="w-10 h-10 bg-secondary/15 text-secondary flex items-center justify-center rounded-lg mb-unit-md">
+        <span class="material-symbols-outlined">menu_book</span>
+      </div>
+      <h3 class="font-headline-sm text-on-surface mb-unit-sm">Recommended Courses</h3>
+      <ul id="coursesList" class="font-body-sm text-on-surface-variant space-y-2">
+        <li>Python for Everybody — Coursera <span class="text-primary text-[10px] uppercase">Free</span></li>
+        <li>Google UX Design Certificate — Coursera</li>
+      </ul>
+    </div>
+    <div class="bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10">
+      <div class="w-10 h-10 bg-tertiary/15 text-tertiary flex items-center justify-center rounded-lg mb-unit-md">
+        <span class="material-symbols-outlined">work</span>
+      </div>
+      <h3 class="font-headline-sm text-on-surface mb-unit-sm">Companies in This Field</h3>
+      <ul id="companiesList" class="font-body-sm text-on-surface-variant space-y-1">
+        <li>Systems Limited — Lahore</li><li>Arbisoft — Lahore</li><li>Careem — Karachi/Lahore</li>
+      </ul>
+      <p class="text-[10px] text-on-surface-variant/50 italic mt-unit-sm">Reference list, not live job openings.</p>
+    </div>
+  </div>
+
+  <!-- Career path steps -->
+  <div class="mt-unit-xl">
+    <h2 class="font-headline-md text-on-surface mb-unit-md">Your Career Path — Next Steps</h2>
+    <div id="careerPathSteps" class="space-y-unit-sm">
+      <div class="flex gap-unit-md bg-surface-container p-unit-md rounded-lg border border-outline-variant/10">
+        <div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-sm shrink-0">1</div>
+        <div>
+          <h4 class="font-headline-sm text-on-surface">Sample step</h4>
+          <p class="font-body-sm text-on-surface-variant">Your real, personalized step-by-step path will appear here after you complete the assessment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/saved.js') }}"></script>
+<script>
+(function () {
+  const stored = sessionStorage.getItem("careerCompassReport");
+  if (!stored) return; // no real report yet — keep showing the sample content
+
+  let report;
+  try {
+    report = JSON.parse(stored);
+  } catch (e) {
+    console.error("Couldn't parse stored report:", e);
+    return;
+  }
+
+  // Update status badge to reflect this is a REAL personalized report
+  const badge = document.getElementById("statusBadge");
+  const note = document.getElementById("statusNote");
+  badge.className = "inline-flex items-center gap-1.5 text-[11px] font-label-sm text-secondary uppercase px-3 py-1 border border-secondary/30 rounded-full bg-secondary/5";
+  badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span> Your Personalized Report';
+  note.textContent = "Generated from your own assessment answers and real occupational data.";
+
+  // Fill in real content
+  if (report.recommended_path) {
+    document.getElementById("recommendedPath").textContent = report.recommended_path;
+  }
+  if (report.why_it_fits) {
+    document.getElementById("whyItFits").textContent = report.why_it_fits;
+  }
+  if (report.macro_context_note) {
+    document.getElementById("macroContextNote").textContent = report.macro_context_note;
+  }
+  if (Array.isArray(report.required_skills) && report.required_skills.length) {
+    const list = document.getElementById("skillsList");
+    list.innerHTML = report.required_skills.map(s => `<li>${s}</li>`).join("");
+  }
+
+  const coursesEl = document.getElementById("coursesList");
+  if (Array.isArray(report.recommended_courses) && report.recommended_courses.length) {
+    coursesEl.innerHTML = report.recommended_courses.map(c => {
+      const nameHtml = c.url
+        ? `<a href="${c.url}" target="_blank" rel="noopener" class="text-secondary hover:underline">${c.name}</a>`
+        : c.name;
+      return `<li>${nameHtml} — ${c.provider} ` +
+        `<span class="${c.free ? 'text-primary' : 'text-secondary'} text-[10px] uppercase">${c.free ? 'Free' : 'Paid'}</span></li>`;
+    }).join("");
+  } else {
+    coursesEl.innerHTML = `<li class="text-on-surface-variant/50 italic">No specific course matches found for this path yet.</li>`;
+  }
+
+  const companiesEl = document.getElementById("companiesList");
+  if (Array.isArray(report.recommended_companies) && report.recommended_companies.length) {
+    companiesEl.innerHTML = report.recommended_companies.map(c =>
+      `<li>${c.name} — ${c.city}</li>`
+    ).join("");
+  } else {
+    companiesEl.innerHTML = `<li class="text-on-surface-variant/50 italic">No curated companies found for this field yet.</li>`;
+  }
+
+  const universitiesEl = document.getElementById("universitiesList");
+  if (Array.isArray(report.recommended_universities) && report.recommended_universities.length) {
+    universitiesEl.innerHTML = report.recommended_universities.map(u =>
+      `<li><span class="text-on-surface">${u.name}</span> — ${u.city}` +
+      `<br/><span class="text-[10px] text-on-surface-variant/60">${u.hec_rank || ''}${u.admission_competitiveness ? ' · ' + u.admission_competitiveness : ''}</span></li>`
+    ).join("");
+  } else {
+    universitiesEl.innerHTML = `<li class="text-on-surface-variant/50 italic">No curated university match found for this field yet.</li>`;
+  }
+
+  const stepsEl = document.getElementById("careerPathSteps");
+  if (Array.isArray(report.career_path_steps) && report.career_path_steps.length) {
+    stepsEl.innerHTML = report.career_path_steps.map(step => `
+      <div class="flex gap-unit-md bg-surface-container p-unit-md rounded-lg border border-outline-variant/10">
+        <div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-sm shrink-0">${step.step_number}</div>
+        <div>
+          <h4 class="font-headline-sm text-on-surface">${step.title}</h4>
+          <p class="font-body-sm text-on-surface-variant">${step.description}</p>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // Wire the download button
+  const downloadBtn = document.getElementById("downloadBtn");
+  downloadBtn.classList.remove("hidden");
+  downloadBtn.addEventListener("click", async () => {
+    downloadBtn.disabled = true;
+    const originalHTML = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = "Preparing PDF...";
+    try {
+      const res = await fetch("/download-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(report)
+      });
+      if (!res.ok) throw new Error("PDF generation failed");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "career_compass_report.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Couldn't generate the PDF: " + err.message);
+    } finally {
+      downloadBtn.disabled = false;
+      downloadBtn.innerHTML = originalHTML;
+    }
+  });
+
+  // Wire the save button — persists to localStorage via CareerCompassSaved
+  // (static/js/saved.js), so it actually survives across sessions, unlike
+  // the sessionStorage-based "current report" used for rendering this page.
+  const saveBtn = document.getElementById("saveBtn");
+  const saveBtnIcon = document.getElementById("saveBtnIcon");
+  const saveBtnLabel = document.getElementById("saveBtnLabel");
+  saveBtn.classList.remove("hidden");
+
+  function refreshSaveButtonState() {
+    if (CareerCompassSaved.isAlreadySaved(report)) {
+      saveBtnIcon.textContent = "bookmark_added";
+      saveBtnLabel.textContent = "Saved — View Saved Options";
+      saveBtn.classList.add("border-secondary", "text-secondary");
+    } else {
+      saveBtnIcon.textContent = "bookmark_add";
+      saveBtnLabel.textContent = "Save This Roadmap";
+      saveBtn.classList.remove("border-secondary", "text-secondary");
+    }
+  }
+  refreshSaveButtonState();
+
+  saveBtn.addEventListener("click", () => {
+    if (CareerCompassSaved.isAlreadySaved(report)) {
+      window.location.href = "/saved";
+      return;
+    }
+    const result = CareerCompassSaved.save(report);
+    if (result.ok) {
+      refreshSaveButtonState();
+    } else {
+      alert("Couldn't save this roadmap to your browser's storage. " +
+            "Your browser storage may be full or private-browsing mode may be blocking it.");
+    }
+  });
+})();
+</script>
+{% endblock %}

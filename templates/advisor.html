@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — AI Advisor{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-margin-mobile lg:px-margin-desktop py-unit-xl">
+
+  <div class="mb-unit-lg">
+    <span class="font-label-lg text-secondary uppercase tracking-widest">Ask Anything</span>
+    <h1 class="font-headline-xl text-headline-xl-mobile lg:text-headline-xl text-on-surface mt-unit-sm">
+      AI Advisor
+    </h1>
+    <p class="font-body-lg text-on-surface-variant mt-unit-md">
+      Ask about your own results, or ask general questions about careers, degrees, and
+      universities in Pakistan — even before you've taken the assessment.
+    </p>
+  </div>
+
+  <!-- Mode toggle — two options, per the second AI Advisor mode requested:
+       "My Results" (report-scoped, existing constrained behavior) and
+       "General" (available anytime, not tied to a specific report). -->
+  <div class="flex gap-unit-sm mb-unit-lg bg-surface-container-low p-1.5 rounded-lg border border-outline-variant/20 w-fit">
+    <button id="modeReportBtn" type="button"
+            class="mode-btn flex items-center gap-1.5 px-unit-md py-2.5 rounded-md font-label-lg text-sm transition-colors">
+      <span class="material-symbols-outlined text-[18px]">quiz</span> My Results
+    </button>
+    <button id="modeGeneralBtn" type="button"
+            class="mode-btn flex items-center gap-1.5 px-unit-md py-2.5 rounded-md font-label-lg text-sm transition-colors">
+      <span class="material-symbols-outlined text-[18px]">public</span> General Questions
+    </button>
+  </div>
+
+  <!-- Shown in "My Results" mode if no report exists yet -->
+  <div id="noReportState" class="hidden bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10 text-center">
+    <span class="material-symbols-outlined text-secondary text-[40px] mb-unit-sm">quiz</span>
+    <h2 class="font-headline-sm text-on-surface mb-unit-sm">Complete your assessment first</h2>
+    <p class="font-body-sm text-on-surface-variant mb-unit-lg">
+      "My Results" mode needs your report to answer questions grounded in your real results.
+      In the meantime, switch to "General Questions" above — that mode works right now.
+    </p>
+    <a href="/questionnaire" class="inline-flex items-center gap-unit-sm px-unit-lg py-3 bg-secondary text-on-secondary font-label-lg rounded-lg">
+      Start Assessment <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+    </a>
+  </div>
+
+  <!-- Chat interface — shared markup for both modes; content/behavior swaps via JS -->
+  <div id="chatState" class="hidden">
+    <div class="bg-surface-container-low border border-outline-variant/20 rounded-xl shadow-2xl flex flex-col" style="height: 60vh;">
+
+      <div class="px-unit-lg py-unit-md border-b border-outline-variant/10 flex items-center gap-unit-sm">
+        <span class="material-symbols-outlined text-secondary" id="chatHeaderIcon">forum</span>
+        <span class="font-label-lg text-on-surface" id="chatHeaderLabel">General Career Questions</span>
+      </div>
+
+      <div id="chatMessages" class="flex-1 overflow-y-auto px-unit-lg py-unit-md space-y-unit-sm"></div>
+
+      <div class="px-unit-lg py-unit-md border-t border-outline-variant/10 flex gap-unit-sm">
+        <input type="text" id="chatInput" placeholder="Ask something..."
+               class="flex-1 bg-surface-container-high border border-outline-variant/30 focus:border-secondary rounded-lg px-unit-md py-3 text-on-surface font-body-md outline-none transition-colors"/>
+        <button id="chatSendBtn" class="bg-secondary text-on-secondary px-unit-md py-3 rounded-lg font-label-lg flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">send</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-unit-sm mt-unit-md" id="suggestedQuestions"></div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const stored = sessionStorage.getItem("careerCompassReport");
+  let report = null;
+  try {
+    report = stored ? JSON.parse(stored) : null;
+  } catch (e) {
+    report = null;
+  }
+  const hasReport = !!report;
+
+  const modeReportBtn = document.getElementById("modeReportBtn");
+  const modeGeneralBtn = document.getElementById("modeGeneralBtn");
+  const noReportEl = document.getElementById("noReportState");
+  const chatEl = document.getElementById("chatState");
+  const headerIcon = document.getElementById("chatHeaderIcon");
+  const headerLabel = document.getElementById("chatHeaderLabel");
+  const messagesEl = document.getElementById("chatMessages");
+  const inputEl = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("chatSendBtn");
+  const suggestedEl = document.getElementById("suggestedQuestions");
+
+  const ACTIVE_CLASSES = ["bg-secondary", "text-on-secondary"];
+  const INACTIVE_CLASSES = ["text-on-surface-variant", "hover:text-on-surface"];
+
+  const REPORT_SUGGESTIONS = [
+    "Why was this career recommended for me?",
+    "What if I can't afford the recommended university?",
+    "What should I do first?"
+  ];
+  const GENERAL_SUGGESTIONS = [
+    "What's the difference between a BS and a BBA?",
+    "Which fields have the best job market in Pakistan right now?",
+    "How do I decide between engineering and computer science?"
+  ];
+
+  let mode = hasReport ? "report" : "general"; // default to whichever is usable
+  let history = { report: [], general: [] }; // separate history per mode
+  let greeted = { report: false, general: false };
+
+  function setModeButtonStyles() {
+    [modeReportBtn, modeGeneralBtn].forEach(btn => {
+      btn.classList.remove(...ACTIVE_CLASSES, ...INACTIVE_CLASSES);
+    });
+    const activeBtn = mode === "report" ? modeReportBtn : modeGeneralBtn;
+    const inactiveBtn = mode === "report" ? modeGeneralBtn : modeReportBtn;
+    activeBtn.classList.add(...ACTIVE_CLASSES);
+    inactiveBtn.classList.add(...INACTIVE_CLASSES);
+  }
+
+  function addMessage(role, text) {
+    const bubble = document.createElement("div");
+    bubble.className = role === "user"
+      ? "ml-auto max-w-[80%] bg-secondary text-on-secondary rounded-lg px-unit-md py-2.5 font-body-sm"
+      : "mr-auto max-w-[80%] bg-surface-container text-on-surface rounded-lg px-unit-md py-2.5 font-body-sm border border-outline-variant/10";
+    bubble.textContent = text;
+    messagesEl.appendChild(bubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function renderSuggestions() {
+    const list = mode === "report" ? REPORT_SUGGESTIONS : GENERAL_SUGGESTIONS;
+    suggestedEl.innerHTML = list.map(q =>
+      `<button class="suggested-q text-[12px] bg-surface-container-high hover:bg-secondary hover:text-on-secondary text-on-surface-variant px-3 py-1.5 rounded-full transition-colors" data-q="${q.replace(/"/g, '&quot;')}">${q}</button>`
+    ).join("");
+    suggestedEl.querySelectorAll(".suggested-q").forEach(btn => {
+      btn.addEventListener("click", () => sendQuestion(btn.dataset.q));
+    });
+  }
+
+  function switchMode(newMode) {
+    if (newMode === "report" && !hasReport) {
+      noReportEl.classList.remove("hidden");
+      chatEl.classList.add("hidden");
+      mode = newMode;
+      setModeButtonStyles();
+      return;
+    }
+    noReportEl.classList.add("hidden");
+    chatEl.classList.remove("hidden");
+    mode = newMode;
+    setModeButtonStyles();
+    renderSuggestions();
+
+    messagesEl.innerHTML = "";
+    if (mode === "report") {
+      headerIcon.textContent = "quiz";
+      headerLabel.textContent = "Chatting about: " + (report && report.recommended_path ? report.recommended_path : "your results");
+      if (!greeted.report) {
+        addMessage("assistant", `Hi! I can answer questions about your ${report.recommended_path || "career"} results — required skills, the matched universities, courses, companies, or your next steps. What would you like to know?`);
+        greeted.report = true;
+      }
+    } else {
+      headerIcon.textContent = "public";
+      headerLabel.textContent = "General Career Questions";
+      if (!greeted.general) {
+        addMessage("assistant", "Hi! Ask me anything about careers, degrees, or universities in Pakistan — no assessment needed for this mode. For advice tailored to you specifically, take the Career Compass assessment and switch to \"My Results\".");
+        greeted.general = true;
+      }
+    }
+    // Replay this mode's history into the chat window
+    history[mode].forEach(turn => addMessage(turn.role === "user" ? "user" : "assistant", turn.text));
+  }
+
+  async function sendQuestion(question) {
+    if (!question.trim()) return;
+    addMessage("user", question);
+    inputEl.value = "";
+    sendBtn.disabled = true;
+
+    const typingBubble = document.createElement("div");
+    typingBubble.className = "mr-auto max-w-[80%] bg-surface-container text-on-surface-variant rounded-lg px-unit-md py-2.5 font-body-sm border border-outline-variant/10 italic";
+    typingBubble.textContent = "Thinking...";
+    messagesEl.appendChild(typingBubble);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    const body = mode === "report"
+      ? { mode: "report", report, question, history: history.report }
+      : { mode: "general", question, history: history.general };
+
+    try {
+      const res = await fetch("/advisor-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      typingBubble.remove();
+
+      if (res.ok) {
+        addMessage("assistant", data.answer);
+        history[mode].push({ role: "user", text: question });
+        history[mode].push({ role: "assistant", text: data.answer });
+      } else {
+        addMessage("assistant", `Sorry, I couldn't answer that right now (${data.error || "unknown error"}). Try again in a moment.`);
+      }
+    } catch (err) {
+      typingBubble.remove();
+      addMessage("assistant", "Couldn't reach the server. Check that the Flask app is running.");
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  modeReportBtn.addEventListener("click", () => switchMode("report"));
+  modeGeneralBtn.addEventListener("click", () => switchMode("general"));
+  sendBtn.addEventListener("click", () => sendQuestion(inputEl.value));
+  inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") sendQuestion(inputEl.value); });
+
+  switchMode(mode); // initial render
+})();
+</script>
+{% endblock %}

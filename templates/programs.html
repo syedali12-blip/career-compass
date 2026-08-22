@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — Programs Directory{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop py-unit-xl">
+
+  <div class="mb-unit-lg">
+    <span class="font-label-lg text-secondary uppercase tracking-widest">Explore</span>
+    <h1 class="font-headline-xl text-headline-xl-mobile lg:text-headline-xl text-on-surface mt-unit-sm">
+      Programs Directory
+    </h1>
+    <p class="font-body-lg text-on-surface-variant mt-unit-md max-w-2xl">
+      Search for a degree to see which universities offer it — ranked with more
+      competitive/higher-tier institutions first, based on our curated reference data.
+    </p>
+    <a href="/universities" class="font-label-sm text-secondary mt-unit-sm inline-flex items-center gap-1">
+      <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to University Comparisons
+    </a>
+  </div>
+
+  <!-- Search -->
+  <div class="relative mb-unit-lg max-w-xl">
+    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+    <input type="text" id="programSearch" placeholder="Search a degree, e.g. Computer Science, Medicine, Fine Arts..."
+           class="w-full bg-surface-container-high border border-outline-variant/30 focus:border-secondary rounded-lg pl-12 pr-4 py-3 text-on-surface font-body-md outline-none transition-colors"/>
+  </div>
+
+  <!-- Quick program tags -->
+  <div class="flex flex-wrap gap-unit-sm mb-unit-lg">
+    {% for program in all_programs %}
+    <button type="button" class="program-tag text-[12px] bg-surface-container-high hover:bg-secondary hover:text-on-secondary text-on-surface-variant px-3 py-1.5 rounded-full transition-colors"
+            data-program="{{ program }}">
+      {{ program }}
+    </button>
+    {% endfor %}
+  </div>
+
+  <p class="text-[11px] text-on-surface-variant/50 italic mt-unit-sm">
+    Exact degree matches use our hand-researched top-7 ranking; broader searches fall back to a
+    competitiveness-based match across our full university database.
+  </p>
+
+  <!-- Results -->
+  <div id="programResults">
+    <p class="text-on-surface-variant font-body-md">Search or select a program above to see which universities offer it.</p>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Embed the full university dataset for client-side lookups
+  const UNIVERSITY_DATA = {{ universities_json | safe }};
+  const UNIVERSITY_BY_NAME = {};
+  UNIVERSITY_DATA.forEach(u => { UNIVERSITY_BY_NAME[u.name] = u; });
+
+  // Authoritative top-7-per-degree ranking (see backend/university_data.py)
+  const DEGREE_RANKINGS = {{ degree_rankings_json | safe }};
+
+  const COMPETITIVENESS_ORDER = {"Highly Competitive": 0, "Competitive": 1, "Moderate": 2};
+
+  const searchInput = document.getElementById("programSearch");
+  const resultsEl = document.getElementById("programResults");
+
+  function findExactDegreeMatch(query) {
+    const queryLower = query.trim().toLowerCase();
+    const exact = Object.keys(DEGREE_RANKINGS).find(d => d.toLowerCase() === queryLower);
+    if (exact) return exact;
+    // loosest containment fallback, preferring the longer/more specific name
+    let best = null;
+    Object.keys(DEGREE_RANKINGS).forEach(d => {
+      const dLower = d.toLowerCase();
+      if (dLower.includes(queryLower) || queryLower.includes(dLower)) {
+        if (!best || d.length > best.length) best = d;
+      }
+    });
+    return best;
+  }
+
+  function renderCard(uni, rank, isTop) {
+    const hasDetail = uni.city != null;
+    return `
+      <div class="bg-surface-container p-unit-lg rounded-lg border ${isTop ? 'border-secondary/50' : 'border-outline-variant/10'} relative">
+        ${isTop ? '<span class="absolute -top-3 left-4 bg-secondary text-on-secondary text-[10px] uppercase px-2 py-1 rounded-full">Top Match</span>' : ''}
+        <p class="font-label-sm text-secondary mb-1">#${rank}</p>
+        <h3 class="font-headline-sm text-on-surface mb-1">${uni.name}</h3>
+        ${hasDetail ? `
+          <p class="font-body-sm text-on-surface-variant mb-unit-sm">${uni.city}</p>
+          <p class="text-[13px] text-on-surface-variant"><span class="text-secondary">Admission:</span> ${uni.admission_competitiveness}</p>
+          <p class="text-[13px] text-on-surface-variant"><span class="text-secondary">HEC Rank:</span> ${uni.hec_rank}</p>
+          <p class="text-[13px] text-on-surface-variant mt-1"><span class="text-secondary">Approx. Fee:</span> PKR ${uni.approx_annual_fee_pkr}</p>
+        ` : `
+          <p class="text-[12px] text-on-surface-variant/50 italic mt-1">Full profile not yet in our detailed database — ranking is still accurate, just fewer stats to show.</p>
+        `}
+      </div>
+    `;
+  }
+
+  function renderResultsForProgram(programQuery) {
+    const query = programQuery.trim().toLowerCase();
+    if (!query) {
+      resultsEl.innerHTML = '<p class="text-on-surface-variant font-body-md">Search or select a program above to see which universities offer it.</p>';
+      return;
+    }
+
+    // Prefer the authoritative ranking when the query matches one of our
+    // 47 curated degrees (exactly, or closely enough via containment).
+    const matchedDegree = findExactDegreeMatch(query);
+    if (matchedDegree) {
+      const names = DEGREE_RANKINGS[matchedDegree];
+      const enriched = names.map(name => UNIVERSITY_BY_NAME[name] || { name, city: null });
+      resultsEl.innerHTML = `
+        <h2 class="font-headline-sm text-on-surface mb-unit-xs">Top ${enriched.length} universities for ${matchedDegree}</h2>
+        <p class="text-[12px] text-on-surface-variant/60 mb-unit-md italic">Hand-researched ranking, best-first.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+          ${enriched.map((u, i) => renderCard(u, i + 1, i === 0)).join("")}
+        </div>
+      `;
+      return;
+    }
+
+    // Fall back to the notable_programs-based proxy search across the
+    // full university database.
+    const matches = UNIVERSITY_DATA
+      .filter(u => u.notable_programs.some(p => p.toLowerCase().includes(query)))
+      .sort((a, b) => (COMPETITIVENESS_ORDER[a.admission_competitiveness] ?? 3) - (COMPETITIVENESS_ORDER[b.admission_competitiveness] ?? 3));
+
+    if (matches.length === 0) {
+      resultsEl.innerHTML = `<p class="text-on-surface-variant font-body-md">No universities in our curated list currently show a matching program for "${programQuery}".</p>`;
+      return;
+    }
+
+    resultsEl.innerHTML = `
+      <h2 class="font-headline-sm text-on-surface mb-unit-md">${matches.length} ${matches.length === 1 ? 'university' : 'universities'} found, best-ranked first</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+        ${matches.map((u, i) => renderCard(u, i + 1, i === 0)).join("")}
+      </div>
+    `;
+  }
+
+  searchInput.addEventListener("input", () => renderResultsForProgram(searchInput.value));
+
+  document.querySelectorAll(".program-tag").forEach(tag => {
+    tag.addEventListener("click", () => {
+      searchInput.value = tag.dataset.program;
+      renderResultsForProgram(tag.dataset.program);
+      window.scrollTo({ top: 300, behavior: "smooth" });
+    });
+  });
+</script>
+{% endblock %}

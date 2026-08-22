@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — Assessment{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col">
+
+  <!-- Progress bar -->
+  <div class="w-full bg-surface-container-high border-b border-outline-variant/10">
+    <div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop py-unit-md flex flex-col gap-unit-xs">
+      <div class="flex justify-between items-end mb-1">
+        <span class="font-label-md text-secondary uppercase tracking-widest" id="phaseLabel">Phase 01: Discovery</span>
+        <span class="font-label-md text-on-surface-variant"><span id="stepNum">1</span> of <span id="stepTotal">15</span></span>
+      </div>
+      <div class="w-full h-1 bg-surface-variant overflow-hidden rounded-full">
+        <div class="h-full bg-secondary transition-all duration-700 ease-out" id="progress-bar" style="width: 6.6%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question area -->
+  <div class="flex-1 flex flex-col items-center justify-center py-unit-xl px-margin-mobile">
+    <div class="w-full max-w-4xl relative">
+      <div class="bg-surface-container shadow-2xl rounded-lg p-unit-lg lg:p-unit-xl relative z-10 border border-outline-variant/10">
+
+        <form id="quizForm"></form>
+
+        <!-- Nav controls -->
+        <div class="mt-unit-xl pt-unit-lg border-t border-outline-variant/20 flex items-center justify-between">
+          <button type="button" id="backBtn"
+                  class="flex items-center gap-unit-xs text-on-surface-variant hover:text-on-surface transition-colors group px-4 py-2 disabled:opacity-30 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">west</span>
+            <span class="font-label-lg uppercase">Previous</span>
+          </button>
+          <button type="button" id="nextBtn"
+                  class="bg-secondary text-on-secondary px-10 py-4 flex items-center gap-unit-sm hover:brightness-110 transition-all rounded-lg shadow-lg">
+            <span class="font-label-lg uppercase" id="nextBtnLabel">Continue</span>
+            <span class="material-symbols-outlined">east</span>
+          </button>
+        </div>
+
+      </div>
+      <div class="absolute -right-32 -bottom-32 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] -z-10"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Loading overlay — shown while the report is being generated.
+     Compass-ring style matches the reference "Building Your Roadmap" design:
+     rotating rings around a central compass icon, a live percent readout,
+     and cycling status lines (swapped to Pakistan-context wording). -->
+<div id="loadingOverlay" class="fixed inset-0 z-[100] bg-background/95 backdrop-blur-md hidden flex-col items-center justify-center px-margin-mobile">
+
+  <!-- Central animated compass -->
+  <div class="relative flex items-center justify-center mb-unit-xl">
+    <div class="absolute w-56 h-56 border border-secondary/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+    <div class="absolute w-56 h-56 border-t-2 border-secondary rounded-full animate-[spin_3s_linear_infinite]"></div>
+    <div class="absolute w-40 h-40 border border-secondary/10 rounded-full animate-ping opacity-20"></div>
+    <div class="absolute w-28 h-28 border border-secondary/40 rounded-full"></div>
+    <div class="relative w-20 h-20 flex items-center justify-center bg-surface-container-highest rounded-full shadow-[0_0_50px_rgba(224,182,92,0.25)]">
+      <span class="material-symbols-outlined text-secondary text-[40px] animate-pulse-glow" style="font-variation-settings: 'FILL' 1;">explore</span>
+    </div>
+  </div>
+
+  <div class="max-w-xl text-center space-y-3">
+    <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-secondary/10 border border-secondary/20 mb-1">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+      </span>
+      <span class="font-label-md text-secondary uppercase tracking-widest">System Processing</span>
+    </div>
+    <h1 class="font-headline-lg text-on-surface">Analyzing your results and <span class="text-secondary">building your roadmap.</span></h1>
+    <p class="font-body-md text-on-surface-variant transition-all duration-500" id="loadingMessage">Analyzing your responses...</p>
+  </div>
+
+  <!-- Percent progress -->
+  <div class="mt-unit-xl w-full max-w-md">
+    <div class="flex justify-between mb-2">
+      <span class="font-label-md text-secondary/60 uppercase tracking-tighter">Engine Stability</span>
+      <span class="font-label-md text-secondary font-mono" id="loadingPercent">4%</span>
+    </div>
+    <div class="w-full h-[2px] bg-white/10 overflow-hidden">
+      <div class="h-full bg-secondary shadow-[0_0_10px_#E0B65C] transition-all duration-700 ease-out" id="loadingProgressBar" style="width: 4%;"></div>
+    </div>
+  </div>
+<div class="hidden lg:block absolute left-16 bottom-16 [writing-mode:vertical-rl] text-secondary/20 font-label-lg tracking-[0.5em] uppercase pointer-events-none">Navigation Protocol</div>
+</div>
+
+<style>
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.12); }
+  }
+  .animate-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+  #loadingOverlay.flex { display: flex; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/questions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

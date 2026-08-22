@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — Saved Options{% endblock %}
+
+{% block content %}
+<div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop py-unit-xl">
+
+  <div class="mb-unit-lg">
+    <span class="font-label-lg text-secondary uppercase tracking-widest">Your Library</span>
+    <h1 class="font-headline-xl text-headline-xl-mobile lg:text-headline-xl text-on-surface mt-unit-sm">
+      Saved Options
+    </h1>
+    <p class="font-body-lg text-on-surface-variant mt-unit-md max-w-2xl">
+      Career paths you've saved from your assessment results. Saved in this browser only —
+      there's no account system yet, so these won't follow you to a different device or browser.
+    </p>
+  </div>
+
+  <!-- Empty state -->
+  <div id="emptyState" class="hidden bg-surface-container p-unit-xl rounded-lg border border-outline-variant/10 text-center">
+    <span class="material-symbols-outlined text-secondary text-[40px] mb-unit-sm">bookmark</span>
+    <h2 class="font-headline-sm text-on-surface mb-unit-sm">Nothing saved yet</h2>
+    <p class="font-body-sm text-on-surface-variant mb-unit-lg max-w-md mx-auto">
+      Complete the assessment, then hit "Save This Roadmap" on your results page to keep it here
+      for later — useful for comparing a few different paths.
+    </p>
+    <a href="/questionnaire" class="inline-flex items-center gap-unit-sm px-unit-lg py-3 bg-secondary text-on-secondary font-label-lg rounded-lg">
+      Start Assessment <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+    </a>
+  </div>
+
+  <!-- Saved cards -->
+  <div id="savedList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter"></div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/saved.js') }}"></script>
+<script>
+(function () {
+  const emptyEl = document.getElementById("emptyState");
+  const listEl = document.getElementById("savedList");
+
+  function formatDate(iso) {
+    try {
+      return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function renderCard(entry) {
+    const report = entry.report || {};
+    const skillsPreview = Array.isArray(report.required_skills) ? report.required_skills.slice(0, 3) : [];
+    const uniPreview = Array.isArray(report.recommended_universities) && report.recommended_universities.length
+      ? report.recommended_universities[0].name : null;
+
+    const card = document.createElement("div");
+    card.className = "bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10 flex flex-col";
+    card.innerHTML = `
+      <div class="flex items-start justify-between mb-unit-sm">
+        <span class="text-[11px] text-on-surface-variant/60">${formatDate(entry.savedAt)}</span>
+        <button class="delete-btn text-on-surface-variant/50 hover:text-secondary transition-colors" title="Remove from Saved Options">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </div>
+      <h3 class="font-headline-sm text-secondary mb-unit-sm">${report.recommended_path || "Untitled path"}</h3>
+      ${report.why_it_fits ? `<p class="font-body-sm text-on-surface-variant mb-unit-md line-clamp-3">${report.why_it_fits}</p>` : ""}
+      ${skillsPreview.length ? `
+        <div class="flex flex-wrap gap-1.5 mb-unit-md">
+          ${skillsPreview.map(s => `<span class="text-[11px] bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-full">${s}</span>`).join("")}
+        </div>` : ""}
+      ${uniPreview ? `<p class="text-[12px] text-on-surface-variant/70 mb-unit-md"><span class="material-symbols-outlined text-[14px] align-middle">school</span> ${uniPreview}</p>` : ""}
+      <div class="mt-auto flex gap-unit-sm">
+        <button class="view-btn flex-1 inline-flex items-center justify-center gap-1.5 px-unit-md py-2.5 bg-secondary text-on-secondary font-label-lg text-sm rounded-lg hover:scale-105 transition-transform">
+          View Full Roadmap <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
+      </div>
+    `;
+
+    card.querySelector(".view-btn").addEventListener("click", () => {
+      // Restore this saved report into sessionStorage — the same key the
+      // results page (sample_roadmap.html) already reads from — so
+      // "viewing" a saved report reuses all its existing render logic.
+      sessionStorage.setItem("careerCompassReport", JSON.stringify(report));
+      window.location.href = "/sample-roadmap";
+    });
+
+    card.querySelector(".delete-btn").addEventListener("click", () => {
+      if (!confirm(`Remove "${report.recommended_path || "this roadmap"}" from Saved Options?`)) return;
+      CareerCompassSaved.remove(entry.id);
+      renderAll();
+    });
+
+    return card;
+  }
+
+  function renderAll() {
+    const all = CareerCompassSaved.getAll();
+    listEl.innerHTML = "";
+    if (all.length === 0) {
+      emptyEl.classList.remove("hidden");
+      listEl.classList.add("hidden");
+      return;
+    }
+    emptyEl.classList.add("hidden");
+    listEl.classList.remove("hidden");
+    all.forEach(entry => listEl.appendChild(renderCard(entry)));
+  }
+
+  renderAll();
+})();
+</script>
+{% endblock %}

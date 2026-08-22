@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — {{ page_title }}{% endblock %}
+
+{% block content %}
+<section class="py-unit-xl min-h-[60vh] flex items-center">
+  <div class="max-w-2xl mx-auto px-margin-mobile lg:px-margin-desktop text-center">
+    <div class="w-16 h-16 mx-auto mb-unit-lg bg-secondary/10 border border-secondary/30 rounded-full flex items-center justify-center">
+      <span class="material-symbols-outlined text-secondary text-[28px]">{{ icon }}</span>
+    </div>
+    <span class="font-label-lg text-secondary uppercase tracking-widest">Coming Soon</span>
+    <h1 class="font-headline-lg text-on-surface mt-unit-sm mb-unit-md">{{ page_title }}</h1>
+    <p class="font-body-lg text-on-surface-variant mb-unit-lg">{{ description }}</p>
+    <a href="/questionnaire"
+       class="inline-flex items-center gap-unit-sm px-unit-lg py-unit-sm bg-secondary text-on-secondary font-label-lg rounded-lg shadow-lg hover:scale-105 transition-transform">
+      Take the Assessment First
+      <span class="material-symbols-outlined">arrow_forward</span>
+    </a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Career Compass — University Comparisons{% endblock %}
+
+{% block content %}
+<div class="w-full bg-surface-container border-y border-outline-variant/20 mb-unit-xl"><div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop py-unit-md flex items-center justify-between"><div class="flex items-center gap-3"><span class="font-label-md text-secondary bg-secondary/10 px-3 py-1 rounded-full uppercase tracking-widest">Analysis Complete</span><div class="h-1 w-24 bg-outline-variant/20 rounded-full overflow-hidden"><div class="h-full bg-secondary w-full"></div></div></div><div class="hidden md:flex items-center gap-2 text-on-surface-variant text-sm"><span class="material-symbols-outlined text-secondary text-[18px]">verified</span>Verified by Career Compass AI</div></div></div>
+<div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop pb-unit-xl">
+
+  <div class="mb-unit-xl grid grid-cols-1 lg:grid-cols-12 gap-unit-xl items-end"><div class="lg:col-span-8">
+    <span class="font-label-lg text-secondary uppercase tracking-widest">Explore</span>
+    <h1 class="font-headline-xl text-headline-xl-mobile lg:text-headline-xl text-on-surface mt-unit-sm">
+      University Comparisons
+    </h1>
+    <p class="font-body-lg text-on-surface-variant mt-unit-md max-w-2xl">
+      A curated reference list of well-known Pakistani universities. Select up to 3 to
+      compare side by side, or filter by category below.
+    </p>
+    <p class="text-[11px] text-on-surface-variant/50 italic mt-unit-sm max-w-2xl">
+      Rankings are based on HEC's most recent published cycle (2023) — HEC has not
+      released an updated ranking since. Fee figures are approximate annual ranges
+      for general orientation, not exact current quotes. "Admission Competitiveness"
+      is a general reputation-based estimate, not an official acceptance-rate
+      statistic. This is a manually maintained reference list, not a live feed.
+    </p>
+    </div><div class="lg:col-span-4 bg-surface-container-high p-unit-lg border border-outline-variant/20 shadow-2xl"><span class="font-label-md text-secondary uppercase tracking-widest">Compare with confidence</span><p class="text-on-surface mt-3 font-headline-sm">Programs, admission difficulty, costs and notable strengths — side by side.</p></div></div>
+    <a href="/programs" class="font-label-sm text-secondary mt-unit-md inline-flex items-center gap-1">
+      <span class="material-symbols-outlined text-[16px]">menu_book</span> Browse universities by degree/program instead &rarr;
+    </a>
+  </div>
+
+  <!-- Category filter pills -->
+  <div class="flex flex-wrap gap-unit-sm mb-unit-lg" id="categoryFilters">
+    {% for cat in categories %}
+    <button type="button" data-category="{{ cat }}"
+            class="category-pill px-unit-md py-2 rounded-full border font-label-md transition-colors
+                   {% if cat == 'All' %}bg-secondary text-on-secondary border-secondary{% else %}border-outline-variant/30 text-on-surface-variant hover:border-secondary{% endif %}">
+      {{ cat }}
+    </button>
+    {% endfor %}
+  </div>
+
+  <!-- Compare bar -->
+  <div id="compareBar" class="hidden sticky top-24 z-20 bg-surface-container-lowest border border-secondary/40 rounded-lg p-unit-md mb-unit-lg flex items-center justify-between shadow-xl">
+    <span class="font-body-sm text-on-surface-variant"><span id="compareCount">0</span> selected for comparison</span>
+    <div class="flex gap-unit-sm">
+      <button id="clearCompare" type="button" class="font-label-sm text-on-surface-variant hover:text-on-surface px-unit-sm">Clear</button>
+      <button id="doCompare" type="button" class="bg-secondary text-on-secondary font-label-sm px-unit-md py-2 rounded-lg">Compare Now</button>
+    </div>
+  </div>
+
+  <!-- University grid -->
+  <div id="universityGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+    {% for u in universities %}
+    <div class="university-card bg-surface-container p-unit-lg rounded-lg border border-outline-variant/10 hover:border-secondary/40 transition-colors"
+         data-category="{{ u.category }}"
+         data-name="{{ u.name }}"
+         data-city="{{ u.city }}"
+         data-category-label="{{ u.category }}"
+         data-sector="{{ u.sector }}"
+         data-established="{{ u.established }}"
+         data-rank="{{ u.hec_rank }}"
+         data-competitiveness="{{ u.admission_competitiveness }}"
+         data-fee="{{ u.approx_annual_fee_pkr }}"
+         data-programs="{{ u.notable_programs | join(', ') }}">
+      <div class="flex items-start justify-between mb-unit-sm">
+        <span class="font-label-sm text-secondary uppercase tracking-wide">{{ u.category }}</span>
+        <input type="checkbox" class="compare-checkbox w-5 h-5 accent-[#D4AF37] cursor-pointer" title="Select to compare"/>
+      </div>
+      <h3 class="font-headline-sm text-on-surface mb-1">{{ u.name }}</h3>
+      <p class="font-body-sm text-on-surface-variant mb-unit-sm">{{ u.city }} &middot; {{ u.sector }} &middot; Est. {{ u.established }}</p>
+      <div class="space-y-1 text-[13px]">
+        <p class="text-on-surface-variant"><span class="text-secondary">HEC Rank:</span> {{ u.hec_rank }}</p>
+        <p class="text-on-surface-variant"><span class="text-secondary">Admission:</span> {{ u.admission_competitiveness }}</p>
+        <p class="text-on-surface-variant"><span class="text-secondary">Approx. Annual Fee:</span> PKR {{ u.approx_annual_fee_pkr }}</p>
+      </div>
+      <div class="flex flex-wrap gap-1 mt-unit-sm">
+        {% for p in u.notable_programs %}
+        <span class="text-[11px] bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full">{{ p }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Comparison modal -->
+  <div id="compareModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center p-6">
+    <div class="bg-surface-container-low border border-outline-variant/20 rounded-xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-y-auto p-unit-lg">
+      <div class="flex items-center justify-between mb-unit-lg">
+        <h2 class="font-headline-md text-on-surface">Side-by-Side Comparison</h2>
+        <button id="closeCompare" type="button" class="text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="compareTable" class="overflow-x-auto"></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Category filtering
+  document.querySelectorAll(".category-pill").forEach(pill => {
+    pill.addEventListener("click", () => {
+      document.querySelectorAll(".category-pill").forEach(p => {
+        p.classList.remove("bg-secondary", "text-on-secondary", "border-secondary");
+        p.classList.add("border-outline-variant/30", "text-on-surface-variant");
+      });
+      pill.classList.add("bg-secondary", "text-on-secondary", "border-secondary");
+      pill.classList.remove("border-outline-variant/30", "text-on-surface-variant");
+
+      const category = pill.dataset.category;
+      document.querySelectorAll(".university-card").forEach(card => {
+        card.style.display = (category === "All" || card.dataset.category === category) ? "" : "none";
+      });
+    });
+  });
+
+  // Compare selection
+  const compareBar = document.getElementById("compareBar");
+  const compareCount = document.getElementById("compareCount");
+  const checkboxes = document.querySelectorAll(".compare-checkbox");
+
+  function updateCompareBar() {
+    const checked = document.querySelectorAll(".compare-checkbox:checked");
+    compareCount.textContent = checked.length;
+    compareBar.classList.toggle("hidden", checked.length === 0);
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener("change", () => {
+      const checkedCount = document.querySelectorAll(".compare-checkbox:checked").length;
+      if (checkedCount > 3) {
+        cb.checked = false;
+        alert("You can compare up to 3 universities at a time.");
+        return;
+      }
+      updateCompareBar();
+    });
+  });
+
+  document.getElementById("clearCompare").addEventListener("click", () => {
+    checkboxes.forEach(cb => cb.checked = false);
+    updateCompareBar();
+  });
+
+  document.getElementById("doCompare").addEventListener("click", () => {
+    const selected = [...document.querySelectorAll(".compare-checkbox:checked")].map(cb => cb.closest(".university-card"));
+    const rows = [
+      ["City", c => c.dataset.city],
+      ["Category", c => c.dataset.categoryLabel],
+      ["Sector", c => c.dataset.sector],
+      ["Established", c => c.dataset.established],
+      ["HEC Rank", c => c.dataset.rank],
+      ["Admission Competitiveness", c => c.dataset.competitiveness],
+      ["Approx. Annual Fee (PKR)", c => c.dataset.fee],
+      ["Notable Programs", c => c.dataset.programs],
+    ];
+
+    let html = '<table class="w-full text-left border-collapse"><thead><tr>';
+    html += '<th class="p-unit-sm text-on-surface-variant font-label-sm border-b border-outline-variant/20">Metric</th>';
+    selected.forEach(c => {
+      html += `<th class="p-unit-sm text-on-surface font-headline-sm border-b border-outline-variant/20">${c.dataset.name}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    rows.forEach(([label, getter]) => {
+      html += `<tr><td class="p-unit-sm text-secondary font-label-sm border-b border-outline-variant/10">${label}</td>`;
+      selected.forEach(c => {
+        html += `<td class="p-unit-sm text-on-surface-variant text-[13px] border-b border-outline-variant/10">${getter(c)}</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    document.getElementById("compareTable").innerHTML = html;
+    document.getElementById("compareModal").classList.remove("hidden");
+    document.getElementById("compareModal").classList.add("flex");
+  });
+
+  document.getElementById("closeCompare").addEventListener("click", () => {
+    document.getElementById("compareModal").classList.add("hidden");
+    document.getElementById("compareModal").classList.remove("flex");
+  });
+</script>
+{% endblock %}

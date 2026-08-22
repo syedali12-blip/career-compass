@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{% block title %}Career Compass{% endblock %}</title>
+<style>
+    @layer base {
+        html, body { margin: 0; padding: 0; }
+        body { overscroll-behavior: none; }
+        main > :first-child { margin-top: 0 !important; }
+        main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+</style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    /* ===== Main page: deep navy background, cream text, warm gold accent =====
+                       Darkened to match the reference designs (premium navy/gold edition,
+                       university comparison dashboard, roadmap loader) — closer to true
+                       near-black navy (#081425-style) instead of the previous lighter navy,
+                       with a slightly warmer/lighter gold for better contrast on dark cards.
+                       (Sidebar uses its own accent override — see the sidebar styles below,
+                       not these page-wide tokens.) */
+                    "background": "#0a192f",
+                    "surface": "#0a192f",
+                    "surface-dim": "#060f1c",
+                    "surface-bright": "#1c2b45",
+                    "surface-container-lowest": "#060f1c",
+                    "surface-container-low": "#0a192f",
+                    "surface-container": "#112240",
+                    "surface-container-high": "#112240",
+                    "surface-container-highest": "#233554",
+                    "surface-variant": "#112240",
+                    "surface-tint": "#E4C77A",
+
+                    "on-background": "#F5F1E8",
+                    "on-surface": "#F5F1E8",
+                    "on-surface-variant": "#B9C2D6",
+
+                    "outline": "#5A5238",
+                    "outline-variant": "#2c3a52",
+
+                    "primary": "#d4af37",
+                    "primary-fixed": "#F5E6BE",
+                    "primary-fixed-dim": "#E4C77A",
+                    "on-primary": "#081425",
+                    "on-primary-fixed": "#1C2541",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "primary-container": "#3A3016",
+                    "on-primary-container": "#E4C77A",
+                    "inverse-primary": "#8C6D28",
+
+                    "secondary": "#d4af37",
+                    "secondary-fixed": "#F0D48A",
+                    "secondary-fixed-dim": "#D4AF37",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#3A3016",
+                    "on-secondary-fixed-variant": "#5d4200",
+                    "secondary-container": "#d4af37",
+                    "on-secondary-container": "#0a192f",
+
+                    "tertiary": "#C9C2B0",
+                    "tertiary-fixed": "#E6E1D3",
+                    "tertiary-fixed-dim": "#C9C2B0",
+                    "on-tertiary": "#1C2541",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "tertiary-container": "#2A2A22",
+                    "on-tertiary-container": "#C9C2B0",
+
+                    "inverse-surface": "#F5F1E8",
+                    "inverse-on-surface": "#1C2541",
+
+                    "error": "#E4877A",
+                    "on-error": "#3A0000",
+                    "error-container": "#5C1A10",
+                    "on-error-container": "#F5CFC7"
+                },
+                borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+                spacing: {
+                    unit: "4px", gutter: "24px", "max-width": "1280px",
+                    "margin-mobile": "16px", "margin-desktop": "64px",
+                    "unit-md": "16px", "unit-lg": "32px", "unit-xl": "64px",
+                    "unit-xs": "4px", "unit-sm": "8px", "container-max": "1280px",
+                    "sidebar-w": "260px"
+                },
+                fontFamily: {
+                    "label-md": ["Inter"], "headline-md": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"], "headline-xl-mobile": ["Hanken Grotesk"], "headline-xl": ["Hanken Grotesk"],
+                    "label-lg": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"],
+                    "headline-sm": ["Hanken Grotesk"], "label-sm": ["Inter"],
+                    "display-lg": ["Hanken Grotesk"], "display-lg-mobile": ["Hanken Grotesk"], "label-caps": ["Inter"]
+                },
+                fontSize: {
+                    "label-md": ["12px", {lineHeight: "1.0", fontWeight: "500"}],
+                    "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}],
+                    "headline-lg": ["32px", {lineHeight: "1.2", fontWeight: "600"}],
+                    "body-lg": ["18px", {lineHeight: "1.6", fontWeight: "400"}],
+                    "headline-xl-mobile": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700"}],
+                    "headline-xl": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700"}],
+                    "label-lg": ["14px", {lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "600"}],
+                    "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}],
+                    "body-sm": ["14px", {lineHeight: "20px", fontWeight: "400"}],
+                    "headline-sm": ["20px", {lineHeight: "28px", fontWeight: "600"}],
+                    "label-sm": ["12px", {lineHeight: "14px", fontWeight: "500"}],
+                    "display-lg-mobile": ["32px", {lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700"}],
+                    "display-lg": ["48px", {lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700"}],
+                    "label-caps": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600"}]
+                }
+            }
+        }
+    }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+{% block extra_head %}{% endblock %}
+</head>
+<body class="bg-[#081425] font-body-md text-on-surface relative">
+
+<!-- Page loader — masks the brief flash of unstyled content while the
+     Tailwind CDN script and web fonts load. Uses plain inline styles
+     (not Tailwind classes) since Tailwind itself is what's still loading. -->
+<div id="pageLoader" style="position:fixed; inset:0; z-index:9999; background:#081425;
+     display:flex; flex-direction:column; align-items:center; justify-content:center;
+     transition:opacity 0.4s ease;">
+  <div style="width:128px; height:128px; position:relative; display:flex; align-items:center; justify-content:center;">
+    <div style="position:absolute; width:128px; height:128px; border-radius:50%; border:1px solid rgba(224,182,92,0.2); animation:pageLoaderSpin 10s linear infinite;"></div>
+    <div style="position:absolute; width:128px; height:128px; border-radius:50%; border-top:2px solid #E0B65C; animation:pageLoaderSpin 3s linear infinite;"></div>
+    <div style="position:absolute; width:64px; height:64px; position:relative;">
+      <div style="position:absolute; inset:0; border-radius:50%; background:rgba(224,182,92,0.25); filter:blur(20px);"></div>
+      <img src="{{ url_for('static', filename='logo_circle.svg') }}" alt="Loading"
+           style="width:64px; height:64px; position:relative; z-index:1; animation:pageLoaderPulse 2s ease-in-out infinite;"/>
+    </div>
+  </div>
+  <p style="color:#F5F1E8; font-family:Georgia,serif; font-size:13px; letter-spacing:2px;
+     text-transform:uppercase; margin-top:20px;">Career Compass</p>
+</div>
+<style>
+  @keyframes pageLoaderSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes pageLoaderPulse { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+</style>
+<script>
+  function hidePageLoader() {
+    var loader = document.getElementById("pageLoader");
+    if (loader && loader.style.display !== "none") {
+      loader.style.opacity = "0";
+      setTimeout(function () { loader.style.display = "none"; }, 400);
+    }
+  }
+  window.addEventListener("load", hidePageLoader);
+  setTimeout(hidePageLoader, 3000); // safety fallback — never stays stuck
+</script>
+
+<!-- Background — rebuilt to match the exact technique originally provided:
+     fixed layer, radial-gradient spotlight glow, CSS linear-gradient grid
+     lines masked with a radial-gradient (not an SVG pattern). -->
+<div class="fixed inset-0 -z-10 bg-[#081425]">
+
+  <!-- Radial spotlight glow, gold instead of the original sky-blue, to match our brand -->
+  <div class="absolute inset-0" style="background-image: radial-gradient(circle 620px at 50% 220px, rgba(224,182,92,0.22), transparent);"></div>
+
+  <!-- Grid lines via CSS linear-gradient, masked so it fades at the edges — exact technique as sent -->
+  <div class="pointer-events-none absolute inset-0"
+       style="background-image: linear-gradient(to right, rgba(224,182,92,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(224,182,92,0.14) 1px, transparent 1px);
+              background-size: 24px 24px;
+              mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 70%, transparent 100%);
+              -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, #000 70%, transparent 100%);
+              mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat;">
+  </div>
+
+  <!-- Subtle grain texture -->
+  <svg class="absolute inset-0 w-full h-full opacity-[0.03] mix-blend-overlay">
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain)"/>
+  </svg>
+
+</div>
+
+<style>
+  @keyframes floatSlow {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -40px) scale(1.08); }
+  }
+  @keyframes floatSlower {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-25px, 35px) scale(1.05); }
+  }
+  @keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes spinReverse {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+  }
+  .animate-float-slow { animation: floatSlow 14s ease-in-out infinite; }
+  .animate-float-slower { animation: floatSlower 18s ease-in-out infinite; }
+  .animate-spin-slow { animation: spinSlow 120s linear infinite; }
+  .animate-spin-reverse { animation: spinReverse 100s linear infinite; }
+
+  /* Shimmer text effect — plain-CSS equivalent of the React/Framer Motion
+     ShimmerText component (no React/motion library needed for this effect) */
+  .shimmer-text {
+    display: inline-block;
+    background: currentColor linear-gradient(
+      to right,
+      currentColor 0%,
+      rgba(255,255,255,0.65) 40%,
+      rgba(255,255,255,0.65) 60%,
+      currentColor 100%
+    );
+    background-size: 50% 200%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerMove 2.6s linear infinite;
+    animation-delay: 1.2s;
+  }
+  @keyframes shimmerMove {
+    0% { background-position-x: -100%; }
+    35% { background-position-x: 250%; }
+    100% { background-position-x: 250%; }
+  }
+</style>
+
+{% block page_nav %}
+<!-- Sidebar navigation — deliberately beige/cream with navy text, distinct
+     from the main navy page background. Uses hardcoded colors (not the
+     page-wide theme tokens) since this is an intentional contrast, not
+     meant to follow the rest of the site's palette. -->
+<aside id="sidebar" class="fixed top-0 left-0 h-screen w-sidebar-w z-50 bg-[#E0B65C] border-r border-[#C79A3F] flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+  <a href="/" class="flex items-center gap-unit-sm px-unit-lg py-unit-lg group border-b border-[#C79A3F]">
+    <img alt="Career Compass Logo" class="h-9 w-9 object-contain transition-transform duration-500 group-hover:rotate-45" src="{{ url_for('static', filename='logo_circle.svg') }}"/>
+    <span class="font-headline-sm text-headline-sm tracking-tight text-[#1C2541] uppercase">Career Compass</span>
+  </a>
+
+  <nav class="flex-1 flex flex-col gap-unit-xs px-unit-md py-unit-lg overflow-y-auto">
+    <a class="sidebar-link flex items-center gap-unit-sm px-unit-md py-3 rounded-lg font-label-lg text-[#1C2541] hover:text-[#081425] hover:bg-[#C79A3F] transition-colors" href="/questionnaire">
+      <span class="material-symbols-outlined text-[20px]">quiz</span> Assessment
+    </a>
+    <a class="sidebar-link flex items-center gap-unit-sm px-unit-md py-3 rounded-lg font-label-lg text-[#1C2541] hover:text-[#081425] hover:bg-[#C79A3F] transition-colors" href="/universities">
+      <span class="material-symbols-outlined text-[20px]">balance</span> University Comparisons
+    </a>
+    <a class="sidebar-link flex items-center gap-unit-sm px-unit-md py-3 rounded-lg font-label-lg text-[#1C2541] hover:text-[#081425] hover:bg-[#C79A3F] transition-colors" href="/programs">
+      <span class="material-symbols-outlined text-[20px]">menu_book</span> Programs Directory
+    </a>
+    <a class="sidebar-link flex items-center gap-unit-sm px-unit-md py-3 rounded-lg font-label-lg text-[#1C2541] hover:text-[#081425] hover:bg-[#C79A3F] transition-colors" href="/about-data">
+      <span class="material-symbols-outlined text-[20px]">verified</span> Our Data
+    </a>
+    <a class="sidebar-link flex items-center gap-unit-sm px-unit-md py-3 rounded-lg font-label-lg text-[#1C2541] hover:text-[#081425] hover:bg-[#C79A3F] transition-colors" href="/saved">
+      <span class="material-symbols-outlined text-[20px]">bookmark</span> Saved Options
+    </a>
+    <a class="sidebar-link flex items-center gap-unit-sm px-unit-md py-3 rounded-lg font-label-lg text-[#1C2541] hover:text-[#081425] hover:bg-[#C79A3F] transition-colors" href="/advisor">
+      <span class="material-symbols-outlined text-[20px]">forum</span> AI Advisor
+    </a>
+  </nav>
+
+  <div class="px-unit-md pb-unit-lg">
+    <a href="/questionnaire" class="flex items-center justify-center gap-1.5 bg-[#1C2541] text-[#F0D48A] font-label-lg px-unit-md py-3 rounded-lg shadow-lg shadow-black/20 hover:scale-105 transition-all">
+      Start Now <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+    </a>
+  </div>
+</aside>
+
+<!-- Mobile top bar — matches the sidebar's beige/navy styling -->
+<div class="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-[#E0B65C] border-b border-[#C79A3F] flex items-center justify-between px-unit-md">
+  <a href="/" class="flex items-center gap-unit-sm">
+    <img alt="Career Compass Logo" class="h-8 w-8 object-contain" src="{{ url_for('static', filename='logo_circle.svg') }}"/>
+    <span class="font-headline-sm text-[#1C2541] uppercase text-[16px]">Career Compass</span>
+  </a>
+  <button id="sidebarToggle" class="text-[#1C2541] p-2">
+    <span class="material-symbols-outlined text-[26px]">menu</span>
+  </button>
+</div>
+<div id="sidebarOverlay" class="lg:hidden hidden fixed inset-0 bg-black/60 z-40"></div>
+{% endblock %}
+
+<style>
+  .sidebar-link.active { color: #081425; background: rgba(11,19,43,0.14); font-weight: 700; }
+</style>
+<script>
+  (function () {
+    var sidebar = document.getElementById("sidebar");
+    var toggle = document.getElementById("sidebarToggle");
+    var overlay = document.getElementById("sidebarOverlay");
+
+    function openSidebar() {
+      sidebar.classList.remove("-translate-x-full");
+      overlay.classList.remove("hidden");
+    }
+    function closeSidebar() {
+      sidebar.classList.add("-translate-x-full");
+      overlay.classList.add("hidden");
+    }
+    if (toggle) toggle.addEventListener("click", openSidebar);
+    if (overlay) overlay.addEventListener("click", closeSidebar);
+
+    // Highlight the current page's link
+    var current = window.location.pathname;
+    document.querySelectorAll(".sidebar-link").forEach(function (link) {
+      if (link.getAttribute("href") === current) link.classList.add("active");
+    });
+  })();
+</script>
+
+<main class="{% block main_class %}pt-16 lg:pt-0 lg:pl-sidebar-w{% endblock %}">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="w-full bg-surface-container-lowest py-unit-xl border-t border-outline-variant/10 {% block footer_class %}lg:pl-sidebar-w{% endblock %}">
+  <div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-unit-md">
+    <div class="text-on-surface-variant text-label-sm">&copy; 2026 Career Compass. Engineering the Guided Journey.</div>
+    <div class="flex gap-unit-md text-label-sm text-on-surface-variant">
+      <a class="hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+      <a class="hover:text-secondary transition-colors" href="#">Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

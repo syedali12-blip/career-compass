@@ -1,0 +1,65 @@
+<svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brass2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0D48A"/>
+      <stop offset="50%" stop-color="#C9A24B"/>
+      <stop offset="100%" stop-color="#8C6D28"/>
+    </linearGradient>
+    <linearGradient id="navyDeep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0C1224"/>
+      <stop offset="100%" stop-color="#050810"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="600" fill="#0A0E1A"/>
+
+  <!-- Outer shield / crest silhouette -->
+  <path d="M 300 40
+           L 470 100
+           L 470 320
+           C 470 430 400 500 300 555
+           C 200 500 130 430 130 320
+           L 130 100
+           Z"
+        fill="url(#navyDeep)" stroke="url(#brass2)" stroke-width="4"/>
+
+  <!-- Inner hairline border -->
+  <path d="M 300 62
+           L 450 115
+           L 450 320
+           C 450 418 388 480 300 528
+           C 212 480 150 418 150 320
+           L 150 115
+           Z"
+        fill="none" stroke="#3A4568" stroke-width="1.5"/>
+
+  <!-- 8-point naval compass star -->
+  <g transform="translate(300,275)">
+    <!-- long cardinal points -->
+    <polygon points="0,-160 18,-18 0,0 -18,-18" fill="url(#brass2)"/>
+    <polygon points="0,160 18,18 0,0 -18,18" fill="#5C6688"/>
+    <polygon points="-160,0 -18,18 0,0 -18,-18" fill="#5C6688"/>
+    <polygon points="160,0 18,18 0,0 18,-18" fill="#5C6688"/>
+    <!-- short diagonal points -->
+    <g opacity="0.9">
+      <polygon points="-113,-113 -13,-13 0,0 -13,-4" fill="#3A4568"/>
+      <polygon points="113,-113 13,-13 0,0 13,-4" fill="#3A4568"/>
+      <polygon points="-113,113 -13,13 0,0 -13,4" fill="#3A4568"/>
+      <polygon points="113,113 13,13 0,0 13,4" fill="#3A4568"/>
+    </g>
+    <!-- center hub -->
+    <circle cx="0" cy="0" r="20" fill="#0A0E1A" stroke="url(#brass2)" stroke-width="3.5"/>
+    <circle cx="0" cy="0" r="6" fill="url(#brass2)"/>
+  </g>
+
+  <!-- Cardinal letter N at top of star -->
+  <text x="300" y="108" text-anchor="middle" fill="url(#brass2)" font-family="Georgia, serif" font-weight="bold" font-size="22" letter-spacing="2">N</text>
+
+  <!-- Bold wordmark -->
+  <text x="300" y="475" text-anchor="middle" fill="#F2EFE7" font-family="'Arial Black', Arial, sans-serif" font-weight="900" font-size="40" letter-spacing="1">CAREER</text>
+  <text x="300" y="512" text-anchor="middle" fill="url(#brass2)" font-family="'Arial Black', Arial, sans-serif" font-weight="900" font-size="40" letter-spacing="4">COMPASS</text>
+
+  <!-- Divider -->
+  <line x1="220" y1="522" x2="380" y2="522" stroke="url(#brass2)" stroke-width="2"/>
+  <text x="300" y="542" text-anchor="middle" fill="#8E97A8" font-family="Arial, sans-serif" font-size="12" letter-spacing="5">CHART YOUR COURSE</text>
+</svg>
