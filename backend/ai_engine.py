@@ -18,16 +18,21 @@ import requests
 
 GEMINI_URL_TEMPLATE = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
-# Tried in order. Both model IDs are current stable Gemini API models.
-# The second model provides a lower-latency fallback if the first model is
-# temporarily rate-limited or unavailable.
-MODEL_CHAIN = ["gemini-3.5-flash", "gemini-3.5-flash-lite"]
+# Tried in order. gemini-3.5-flash/-lite are current, but newer/high-demand
+# models see frequent transient 503 "overloaded" errors from Google's own
+# infrastructure (confirmed via Google's own developer forums — this is a
+# known, ongoing issue, not something wrong in this code). gemini-2.5-flash
+# and gemini-2.5-flash-lite are added as a second tier: an older, more
+# established generation that tends to see less contention, so a 503 on the
+# newer models has somewhere real to fall back to instead of just failing.
+MODEL_CHAIN = ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
 
 # Free-tier rate limits mean occasional 429s are expected, especially during
-# rapid testing. Retry a few times with increasing delay before giving up
-# on a given model and moving to the next one in the chain.
+# rapid testing. 503s ("model overloaded" on Google's end) are also common
+# and just as transient. Retry a few times with a short delay before giving
+# up on a given model and moving to the next one in the chain.
 MAX_RETRIES_PER_MODEL = 2
-RETRY_DELAY_SECONDS = 15
+RETRY_DELAY_SECONDS = 5
 
 
 def _api_key():
@@ -114,13 +119,17 @@ INSTRUCTIONS:
 
 def _call_gemini_model(model, payload):
     """
-    Calls a single Gemini model, retrying on 429 up to MAX_RETRIES_PER_MODEL
-    times. Returns the parsed response JSON on success, or raises
-    RuntimeError("RATE_LIMITED") specifically when this model is exhausted,
-    so the caller knows to try the next model in the chain (vs. other
-    errors, which should stop the whole process, not just skip a model).
+    Calls a single Gemini model, retrying on 429 (rate limit) AND 503/502/504
+    (transient server-side "overloaded"/unavailable errors — common on
+    Google's end, especially on newer models, and NOT the same thing as a
+    quota/rate-limit issue) up to MAX_RETRIES_PER_MODEL times each. Raises
+    RuntimeError("MODEL_UNAVAILABLE") when this model is exhausted, so the
+    caller knows to try the next model in the chain (vs. other error types,
+    like a genuine 400/401, which should stop the whole process outright —
+    retrying or falling back won't fix a bad request or bad API key).
     """
     url = GEMINI_URL_TEMPLATE.format(model=model)
+    TRANSIENT_STATUS_CODES = {429, 500, 502, 503, 504}
 
     for attempt in range(1, MAX_RETRIES_PER_MODEL + 1):
         response = requests.post(
@@ -130,11 +139,11 @@ def _call_gemini_model(model, payload):
             json=payload,
             timeout=30
         )
-        if response.status_code == 429:
+        if response.status_code in TRANSIENT_STATUS_CODES:
             if attempt < MAX_RETRIES_PER_MODEL:
                 time.sleep(RETRY_DELAY_SECONDS)
                 continue
-            raise RuntimeError("RATE_LIMITED")
+            raise RuntimeError("MODEL_UNAVAILABLE")
 
         try:
             response.raise_for_status()
@@ -274,17 +283,18 @@ def generate_report_content(student_answers, occupation_profile, companies=None,
             result = _call_gemini_model(model, payload)
             break  # success — stop trying further models
         except RuntimeError as e:
-            if str(e) == "RATE_LIMITED":
+            if str(e) == "MODEL_UNAVAILABLE":
                 last_error = RuntimeError(
-                    f"Gemini model '{model}' rate limit hit (free tier)."
+                    f"Gemini model '{model}' was rate-limited or temporarily unavailable."
                 )
                 continue  # try the next model in the chain
             raise  # any other error type stops the whole process
 
     if result is None:
         raise RuntimeError(
-            "All available Gemini models are currently rate-limited (free tier). "
-            "This usually resets within a few minutes — try again shortly."
+            "All available Gemini models are currently rate-limited or "
+            "temporarily overloaded on Google's end. This usually resolves "
+            "within a few minutes — try again shortly."
         ) from last_error
 
     try:
@@ -459,15 +469,15 @@ def _call_advisor_prompt(prompt):
             result = _call_gemini_model(model, payload)
             break
         except RuntimeError as e:
-            if str(e) == "RATE_LIMITED":
-                last_error = RuntimeError(f"Gemini model '{model}' rate limit hit (free tier).")
+            if str(e) == "MODEL_UNAVAILABLE":
+                last_error = RuntimeError(f"Gemini model '{model}' was rate-limited or temporarily unavailable.")
                 continue
             raise
 
     if result is None:
         raise RuntimeError(
-            "All available Gemini models are currently rate-limited (free tier). "
-            "Try again shortly."
+            "All available Gemini models are currently rate-limited or "
+            "temporarily overloaded on Google's end. Try again shortly."
         ) from last_error
 
     try:
