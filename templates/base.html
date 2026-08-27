@@ -128,27 +128,37 @@
 </head>
 <body class="bg-[#081425] font-body-md text-on-surface relative">
 
-<!-- Page loader — masks the brief flash of unstyled content while the
-     Tailwind CDN script and web fonts load. Uses plain inline styles
-     (not Tailwind classes) since Tailwind itself is what's still loading. -->
-<div id="pageLoader" style="position:fixed; inset:0; z-index:9999; background:#081425;
+<!-- Page loader — the site's main/universal loading screen, shown on EVERY
+     page load while Tailwind CDN and web fonts load (masks the flash of
+     unstyled content). "Premium navy/gold editorial" design — same needle
+     compass mark and typography as the shared operation loader
+     (_loading_overlay.html), so the whole site has one consistent loading
+     screen instead of two different designs for "page load" vs "waiting on
+     an action." Uses plain inline styles, not Tailwind classes, since
+     Tailwind itself is what's still loading at this point. -->
+<div id="pageLoader" style="position:fixed; inset:0; z-index:9999; background:#0d1c32;
      display:flex; flex-direction:column; align-items:center; justify-content:center;
      transition:opacity 0.4s ease;">
-  <div style="width:128px; height:128px; position:relative; display:flex; align-items:center; justify-content:center;">
-    <div style="position:absolute; width:128px; height:128px; border-radius:50%; border:1px solid rgba(224,182,92,0.2); animation:pageLoaderSpin 10s linear infinite;"></div>
-    <div style="position:absolute; width:128px; height:128px; border-radius:50%; border-top:2px solid #E0B65C; animation:pageLoaderSpin 3s linear infinite;"></div>
-    <div style="position:absolute; width:64px; height:64px; position:relative;">
-      <div style="position:absolute; inset:0; border-radius:50%; background:rgba(224,182,92,0.25); filter:blur(20px);"></div>
-      <img src="{{ url_for('static', filename='logo_circle.svg') }}" alt="Loading"
-           style="width:64px; height:64px; position:relative; z-index:1; animation:pageLoaderPulse 2s ease-in-out infinite;"/>
-    </div>
+
+  <!-- Needle compass mark, spinning rings -->
+  <div style="position:relative; width:64px; height:64px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+    <div style="position:absolute; inset:0; border-radius:50%; border:1px solid rgba(212,175,55,0.3); animation:pageLoaderSpin 10s linear infinite;"></div>
+    <div style="position:absolute; inset:6px; border-radius:50%; border:1px solid rgba(212,175,55,0.5); animation:pageLoaderSpinReverse 6s linear infinite;"></div>
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="color:#d4af37; animation:pageLoaderPulse 2s ease-in-out infinite;">
+      <path d="M12 2L15 12L12 22L9 12L12 2Z" fill="currentColor"></path>
+      <path d="M12 12L15 12L12 22L9 12L12 12Z" fill="currentColor" fill-opacity="0.5"></path>
+    </svg>
   </div>
-  <p style="color:#F5F1E8; font-family:Georgia,serif; font-size:13px; letter-spacing:2px;
-     text-transform:uppercase; margin-top:20px;">Career Compass</p>
+
+  <p style="color:#ffffff; font-family:'Bodoni Moda',serif; font-size:28px; font-weight:700;
+     letter-spacing:-0.01em; margin:0 0 6px 0;">Career Compass</p>
+  <p style="color:#d4af37; font-family:Hanken Grotesk,sans-serif; font-size:11px; letter-spacing:0.2em;
+     text-transform:uppercase; margin:0;">Navigating what comes next</p>
 </div>
 <style>
   @keyframes pageLoaderSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes pageLoaderPulse { 0%, 100% { opacity: 0.75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+  @keyframes pageLoaderSpinReverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+  @keyframes pageLoaderPulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
 </style>
 <script>
   function hidePageLoader() {
