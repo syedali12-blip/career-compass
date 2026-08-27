@@ -119,6 +119,11 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Bodoni Moda + Courier Prime — used by the shared loading overlay
+     (templates/_loading_overlay.html), which now appears on every page
+     that has a loading operation, not just the assessment. -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400..700&family=Courier+Prime&display=swap" rel="stylesheet"/>
+<script src="{{ url_for('static', filename='js/loading.js') }}"></script>
 {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-[#081425] font-body-md text-on-surface relative">
@@ -316,6 +321,8 @@
 <main class="{% block main_class %}pt-16 lg:pt-0 lg:pl-sidebar-w{% endblock %}">
 {% block content %}{% endblock %}
 </main>
+
+{% include "_loading_overlay.html" %}
 
 <footer class="w-full bg-surface-container-lowest py-unit-xl border-t border-outline-variant/10 {% block footer_class %}lg:pl-sidebar-w{% endblock %}">
   <div class="max-w-container-max mx-auto px-margin-mobile lg:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-unit-md">

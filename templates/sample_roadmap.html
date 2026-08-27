@@ -237,8 +237,17 @@
   downloadBtn.classList.remove("hidden");
   downloadBtn.addEventListener("click", async () => {
     downloadBtn.disabled = true;
-    const originalHTML = downloadBtn.innerHTML;
-    downloadBtn.innerHTML = "Preparing PDF...";
+
+    // Shared loading overlay — same design as everywhere else in the app.
+    CareerCompassLoader.show({
+      tagline: "Preparing your PDF",
+      messages: [
+        "Laying out your report...",
+        "Rendering charts...",
+        "Almost ready..."
+      ]
+    });
+
     try {
       const res = await fetch("/download-report", {
         method: "POST",
@@ -255,11 +264,12 @@
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
+      CareerCompassLoader.finish();
     } catch (err) {
       alert("Couldn't generate the PDF: " + err.message);
     } finally {
+      CareerCompassLoader.hide();
       downloadBtn.disabled = false;
-      downloadBtn.innerHTML = originalHTML;
     }
   });
 

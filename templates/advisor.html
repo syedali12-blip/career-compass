@@ -179,11 +179,15 @@
     inputEl.value = "";
     sendBtn.disabled = true;
 
-    const typingBubble = document.createElement("div");
-    typingBubble.className = "mr-auto max-w-[80%] bg-surface-container text-on-surface-variant rounded-lg px-unit-md py-2.5 font-body-sm border border-outline-variant/10 italic";
-    typingBubble.textContent = "Thinking...";
-    messagesEl.appendChild(typingBubble);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    // Shared loading overlay — same design as everywhere else in the app.
+    CareerCompassLoader.show({
+      tagline: mode === "report" ? "Reading your results" : "Thinking it through",
+      messages: [
+        "Reviewing your question...",
+        "Checking real data before answering...",
+        "Putting together a clear answer..."
+      ]
+    });
 
     const body = mode === "report"
       ? { mode: "report", report, question, history: history.report }
@@ -196,7 +200,8 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
-      typingBubble.remove();
+      CareerCompassLoader.finish();
+      CareerCompassLoader.hide();
 
       if (res.ok) {
         addMessage("assistant", data.answer);
@@ -206,7 +211,8 @@
         addMessage("assistant", `Sorry, I couldn't answer that right now (${data.error || "unknown error"}). Try again in a moment.`);
       }
     } catch (err) {
-      typingBubble.remove();
+      CareerCompassLoader.finish();
+      CareerCompassLoader.hide();
       addMessage("assistant", "Couldn't reach the server. Check that the Flask app is running.");
     } finally {
       sendBtn.disabled = false;

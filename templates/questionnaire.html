@@ -1,12 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Career Compass — Assessment{% endblock %}
 
-{% block extra_head %}
-<!-- Bodoni Moda + Courier Prime — used only by the loading overlay below,
-     to match the "premium navy/gold editorial" loading screen reference. -->
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400..700&family=Courier+Prime&display=swap" rel="stylesheet"/>
-{% endblock %}
-
 {% block content %}
 <div class="min-h-screen flex flex-col">
 
@@ -51,62 +45,6 @@
 
 </div>
 
-<!-- Loading overlay — shown while the report is being generated.
-     "Premium navy/gold editorial" style matching the reference loading
-     experience: needle-style compass mark, Bodoni Moda display type, a
-     monospace status/percent readout, and a thin gold progress line —
-     rather than the earlier ring-and-icon compass design. -->
-<div id="loadingOverlay" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center px-margin-mobile overflow-hidden" style="background-color:#0d1c32;">
-
-  <!-- Subtle gradient overlay for depth, matching the reference design -->
-  <div class="absolute inset-0 z-0 pointer-events-none" style="background: linear-gradient(to bottom, rgba(13,28,50,0.8), rgba(13,28,50,0.4), rgba(13,28,50,1));"></div>
-
-  <!-- Decorative editorial grid lines -->
-  <div class="absolute inset-0 z-0 pointer-events-none opacity-5">
-    <div class="w-full h-full border-l border-r border-white max-w-container-max mx-auto flex justify-between">
-      <div class="w-px h-full bg-white"></div>
-      <div class="w-px h-full bg-white"></div>
-      <div class="w-px h-full bg-white hidden md:block"></div>
-      <div class="w-px h-full bg-white hidden md:block"></div>
-    </div>
-  </div>
-
-  <div class="relative z-10 flex flex-col items-center max-w-container-max w-full">
-
-    <!-- Branding group -->
-    <div class="flex flex-col items-center mb-unit-xl text-center">
-      <!-- Needle compass mark, spinning rings -->
-      <div class="relative w-16 h-16 mb-unit-md flex items-center justify-center">
-        <div class="absolute inset-0 rounded-full border border-secondary/30 animate-[spin_10s_linear_infinite]"></div>
-        <div class="absolute inset-2 rounded-full border border-secondary/50 animate-[spin_6s_linear_infinite_reverse]"></div>
-        <svg class="w-8 h-8 text-secondary animate-[pulse_2s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L15 12L12 22L9 12L12 2Z" fill="currentColor"></path>
-          <path d="M12 12L15 12L12 22L9 12L12 12Z" fill="currentColor" fill-opacity="0.5"></path>
-        </svg>
-      </div>
-      <h1 class="mb-2 tracking-tight drop-shadow-lg" style="font-family:'Bodoni Moda',serif; font-size:44px; line-height:1.1; font-weight:700; color:#ffffff;">
-        Career Compass
-      </h1>
-      <p class="font-label-md uppercase tracking-[0.2em] text-secondary text-xs" id="loadingTitle">Navigating what comes next</p>
-    </div>
-
-    <!-- Loading mechanism -->
-    <div class="w-full max-w-md flex flex-col items-center gap-3">
-      <div class="w-full flex justify-between items-end px-2">
-        <span class="text-[13px] animate-pulse" style="font-family:'Courier Prime',monospace; color:#b9c7e4;" id="loadingMessage">Analyzing your responses...</span>
-        <span class="text-[13px] text-secondary" style="font-family:'Courier Prime',monospace;" id="loadingPercent">4%</span>
-      </div>
-      <div class="w-full h-[1px] bg-white/10 relative overflow-hidden">
-        <div class="absolute top-0 left-0 h-full bg-secondary shadow-[0_0_10px_rgba(254,212,136,0.5)] transition-all duration-700 ease-out" id="loadingProgressBar" style="width: 4%;"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<style>
-  #loadingOverlay.flex { display: flex; }
-</style>
 {% endblock %}
 
 {% block scripts %}
