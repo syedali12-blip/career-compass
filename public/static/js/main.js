@@ -235,41 +235,13 @@ const LOADING_MESSAGES = [
 function submitAnswers() {
   console.log("Final answers:", answers);
 
-  const overlay = document.getElementById("loadingOverlay");
-  const msgEl = document.getElementById("loadingMessage");
-  const percentEl = document.getElementById("loadingPercent");
-  const barEl = document.getElementById("loadingProgressBar");
-  overlay.classList.remove("hidden");
-  overlay.classList.add("flex");
-
-  let msgIndex = 0;
-  const msgInterval = setInterval(() => {
-    msgIndex = (msgIndex + 1) % LOADING_MESSAGES.length;
-    msgEl.classList.add("opacity-0");
-    setTimeout(() => {
-      msgEl.textContent = LOADING_MESSAGES[msgIndex];
-      msgEl.classList.remove("opacity-0");
-    }, 250);
-  }, 1600);
-
-  // Fake-but-honest progress readout: never claims 100% until the real
-  // response comes back, since we don't know how long O*NET/Gemini will
-  // actually take. Creeps toward 95% and holds, then jumps to 100% on success.
-  let percent = 4;
-  const progressInterval = setInterval(() => {
-    if (percent < 95) {
-      percent += Math.floor(Math.random() * 6) + 2;
-      if (percent > 95) percent = 95;
-      percentEl.textContent = percent + "%";
-      barEl.style.width = percent + "%";
-    }
-  }, 900);
-
-  function finishProgress() {
-    clearInterval(progressInterval);
-    percentEl.textContent = "100%";
-    barEl.style.width = "100%";
-  }
+  // Shared loading overlay (static/js/loading.js) — same design used
+  // everywhere else in the app (AI Advisor, PDF download), not a
+  // page-specific implementation.
+  CareerCompassLoader.show({
+    tagline: "Building your roadmap",
+    messages: LOADING_MESSAGES
+  });
 
   fetch("/generate-report", {
     method: "POST",
@@ -278,8 +250,7 @@ function submitAnswers() {
   })
     .then(res => res.json().then(data => ({ status: res.status, data })))
     .then(({ status, data }) => {
-      clearInterval(msgInterval);
-      finishProgress();
+      CareerCompassLoader.finish();
       if (status !== 200) {
         console.error("Report generation failed:", data.error);
         alert("Something went wrong generating your report: " + data.error +
@@ -292,8 +263,7 @@ function submitAnswers() {
       window.location.href = "/sample-roadmap";
     })
     .catch(err => {
-      clearInterval(msgInterval);
-      finishProgress();
+      CareerCompassLoader.finish();
       console.error("Network error:", err);
       alert("Couldn't reach the server. Check that the Flask app is running.\n\n(Falling back to the sample roadmap for now.)");
       window.location.href = "/sample-roadmap";
